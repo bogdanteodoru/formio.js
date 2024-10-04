@@ -189,10 +189,14 @@ export default class TextAreaComponent extends TextFieldComponent {
               dataValue = (this.component.multiple && Array.isArray(dataValue)) ? dataValue[index] : dataValue;
               const value = this.setConvertedValue(dataValue, index);
               const isReadOnly = this.options.readOnly || this.disabled;
+              const newCKE = _.get(this.options, 'editors.ckeditor.new', false);
               // Use ckeditor 4 in IE browser
               if (getBrowserInfo().ie) {
                 editor.on('instanceReady', () => {
-                  editor.setReadOnly(isReadOnly);
+                  if (!newCKE) {
+                    editor.setReadOnly(isReadOnly);
+                  }
+
                   editor.setData(value);
                 });
               }
@@ -204,7 +208,11 @@ export default class TextAreaComponent extends TextFieldComponent {
                   const editorHeight = (numRows * 31) + 14;
                   editor.ui.view.editable.editableElement.style.height = `${(editorHeight)}px`;
                 }
-                editor.isReadOnly = isReadOnly;
+
+                if (!newCKE) {
+                  editor.isReadOnly = isReadOnly;
+                }
+
                 editor.data.set(value);
               }
 

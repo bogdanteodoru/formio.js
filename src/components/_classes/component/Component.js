@@ -2617,9 +2617,12 @@ export default class Component extends Element {
       settings.extraPlugins.push(getFormioUploadAdapterPlugin(this.fileService, this));
     }
 
+    const newCKE = _.get(this.options, 'editors.ckeditor.new', false);
+    const globalCKE = newCKE ? CKEDITOR : window;
+
     return Formio.requireLibrary(
       'ckeditor',
-      isIEBrowser ? 'CKEDITOR' : 'ClassicEditor',
+      isIEBrowser || newCKE ? 'CKEDITOR' : 'ClassicEditor',
       _.get(this.options, 'editors.ckeditor.src',
       `${Formio.cdn.ckeditor}/ckeditor.js`
     ), true)
@@ -2633,7 +2636,7 @@ export default class Component extends Element {
           return Promise.resolve(editor);
         }
         else {
-          return ClassicEditor.create(element, settings).then(editor => {
+          return globalCKE.ClassicEditor.create(element, settings).then(editor => {
             editor.model.document.on('change', () => onChange(editor.data.get()));
             return editor;
           });
